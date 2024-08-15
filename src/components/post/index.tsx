@@ -1,12 +1,13 @@
-const names = ['Aleksei', 'Aleksey'];
+type Props = {
+  author: string;
+  body: string;
+};
 
-export default function Post() {
-  const chooseName = Math.random() > 0.5 ? names[0] : names[1];
-
+export default function Post(props: Props) {
   return (
     <div>
-      <p>{chooseName}</p>
-      <p>Lorem ipsum dolor sit amet.</p>
+      <p>{props.author}</p>
+      <p>{props.body}</p>
     </div>
-  )
+  );
 }
