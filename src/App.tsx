@@ -1,9 +1,8 @@
-import './App.css'
+import "./App.css";
+import Post from './components/post';
 
 function App() {
-  return (
-    <h1>hello World!</h1>
-  )
+  return <Post />;
 }
 
-export default App
+export default App;
