@@ -1,27 +1,22 @@
-import { useState } from 'react';
 import classes from './styles.module.css'
 
-export default function NewPost() {
-  const [body, setBody] = useState('');
-  const [name, setName] = useState('');
+type Props = {
+  body: string;
+  name: string;
+  onChangeBody: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onChangeName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
-  function handleChangeBody(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    setBody(event.target.value);
-  }
-
-  function handleChangeName(event: React.ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value);
-  }
-
+export default function NewPost(props: Props) {
   return (
     <form className={classes.form}>
       <div className={classes.field}>
         <label htmlFor="body">Body</label>
-        <textarea id="body" value={body} required rows={3} onChange={handleChangeBody} />
+        <textarea id="body" value={props.body} required rows={3} onChange={props.onChangeBody} />
       </div>
       <div className={classes.field}>
         <label htmlFor="name">Author's name</label>
-        <input type="text" id="name" value={name} required onChange={handleChangeName}/>
+        <input type="text" id="name" value={props.name} required onChange={props.onChangeName}/>
       </div>
     </form>
   )
