@@ -4,28 +4,41 @@ import Modal from '../modal';
 import styles from "./styles.module.css";
 import { usePosts } from './hooks';
 
-export default function Posts() {
+type Props = {
+  isOpenModal: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+};
+
+export default function Posts({
+  isOpenModal,
+  openModal,
+  closeModal,
+}: Props) {
   const {
     body,
     name,
-    onChangeBody,
-    onChangeName,
+    handleChangeBody,
+    handleChangeName,
     items,
     idSelectedPost,
     handleSelectPost,
+    handleCloseModal,
+  } = usePosts({
     isOpenModal,
     openModal,
     closeModal,
-  } = usePosts();
+  });
 
   return (
     <>
-      <Modal open={isOpenModal} onClose={closeModal}>
+      <Modal open={isOpenModal} onClose={handleCloseModal}>
         <NewPost
+          id={idSelectedPost}
           body={body}
           name={name}
-          onChangeBody={onChangeBody}
-          onChangeName={onChangeName}
+          onChangeBody={handleChangeBody}
+          onChangeName={handleChangeName}
         />
       </Modal>
       <ul className={styles.root}>

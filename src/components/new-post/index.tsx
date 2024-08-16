@@ -1,6 +1,7 @@
 import classes from './styles.module.css'
 
 type Props = {
+  id?: number | null;
   body: string;
   name: string;
   onChangeBody: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
