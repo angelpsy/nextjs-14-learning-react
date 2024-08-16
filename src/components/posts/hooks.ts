@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useModal } from '../../hooks/modal';
 
 export const useForm = () => {
   const [body, setBody] = useState("");
@@ -14,12 +13,12 @@ export const useForm = () => {
   }
 
   return {
-    body,
-    name,
-    setBody,
-    setName,
-    onChangeBody: handleChangeBody,
-    onChangeName: handleChangeName,
+      body,
+      name,
+      setBody,
+      setName,
+      handleChangeBody,
+      handleChangeName,
   };
 };
 
@@ -77,15 +76,18 @@ export const useItems = () => {
   };
 };
 
-export const usePosts = () => {
+export const usePosts = ({
+  isOpenModal,
+  openModal,
+  closeModal,
+}: {
+  isOpenModal: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+}) => {
   const { items, idSelectedPost, selectPost } = useItems();
-  const { body, name, setBody, setName, onChangeBody, onChangeName } =
+  const { body, name, setBody, setName, handleChangeBody, handleChangeName } =
     useForm();
-  const {
-    open: openModal,
-    close: closeModal,
-    isOpen: isOpenModal,
-  } = useModal();
 
   const handleSelectPost = (id: number | null) => {
     const post = selectPost(id);
@@ -98,7 +100,7 @@ export const usePosts = () => {
     }
   };
 
-  const handlerCloseModal = () => {
+  const handleCloseModal = () => {
     handleSelectPost(null);
   };
 
@@ -107,13 +109,13 @@ export const usePosts = () => {
     name,
     setBody,
     setName,
-    onChangeBody,
-    onChangeName,
+    handleChangeBody,
+    handleChangeName,
     items,
     idSelectedPost,
     handleSelectPost,
     isOpenModal,
     openModal,
-    closeModal: handlerCloseModal,
+    handleCloseModal,
   };
 };
