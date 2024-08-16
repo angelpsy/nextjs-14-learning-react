@@ -16,15 +16,13 @@ export default function Posts({
   closeModal,
 }: Props) {
   const {
-    body,
-    name,
-    handleChangeBody,
-    handleChangeName,
     items,
     idSelectedPost,
+    selectedPost,
     handleSelectPost,
     handleCloseModal,
     handleResetForNewPost,
+    handleSubmitForm,
   } = usePosts({
     isOpenModal,
     openModal,
@@ -34,14 +32,13 @@ export default function Posts({
   return (
     <>
       <Modal open={isOpenModal} onClose={handleCloseModal}>
-        <NewPost
+        {isOpenModal && <NewPost
           id={idSelectedPost}
-          body={body}
-          name={name}
-          onChangeBody={handleChangeBody}
-          onChangeName={handleChangeName}
+          defaultBody={selectedPost?.body}
+          defaultName={selectedPost?.author}
           onCancel={handleResetForNewPost}
-        />
+          onSubmit={handleSubmitForm}
+        />}
       </Modal>
       <ul className={styles.root}>
         {items.map((item) => {
@@ -49,7 +46,7 @@ export default function Posts({
             <Post
               className={styles.card}
               key={item.id}
-              id={item.id}
+              id={item.id as number}
               author={item.author}
               body={item.body}
               selected={idSelectedPost === item.id}

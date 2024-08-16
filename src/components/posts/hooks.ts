@@ -1,39 +1,7 @@
-import { useState } from "react";
-
-export const useForm = () => {
-  const [body, setBody] = useState("");
-  const [name, setName] = useState("");
-
-  function handleChangeBody(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    setBody(getValueOfInput(event));
-  }
-
-  function handleChangeName(event: React.ChangeEvent<HTMLInputElement>) {
-    setName(getValueOfInput(event));
-  }
-
-  function handleReset() {
-    setBody("");
-    setName("");
-  }
-
-  return {
-    body,
-    name,
-    setBody,
-    setName,
-    handleChangeBody,
-    handleChangeName,
-    handleReset,
-  };
-};
-
-export const getValueOfInput = (
-  event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => event.target.value;
+import { useMemo, useState } from "react";
 
 type Item = {
-  id: number;
+  id: number | null;
   author: string;
   body: string;
 };
@@ -53,12 +21,16 @@ export const useItems = () => {
 
   const [idSelectedPost, setIdSelectedPost] = useState<null | number>(null);
 
+  const selectedPost = useMemo<Item>(() => {
+    return items.find((item) => item.id === idSelectedPost) || { id: null, body: "", author: "" };
+  }, [idSelectedPost, items]);
+
   function selectPost(id: number | null) {
     if (id === null || idSelectedPost === id) {
       setIdSelectedPost(null);
       return {
         body: "",
-        name: "",
+        author: "",
       };
     }
     setIdSelectedPost(id);
@@ -66,19 +38,51 @@ export const useItems = () => {
     if (post) {
       return {
         body: post.body,
-        name: post.author,
+        author: post.author,
       };
     }
     return {
       body: "",
-      name: "",
+      author: "",
     };
+  }
+
+  function updateItem(id: number, body: string, author: string) {
+    setItems((prevItems) => {
+        return prevItems.map((item) => {
+          if (item.id === id) {
+            return {
+              ...item,
+              body,
+              author,
+            };
+          }
+          return item;
+        });
+    });
+  }
+
+  function addItem(body: string, author: string) {
+    setItems((prevItems) => {
+      const id = prevItems.length + 1;
+      return [
+        ...prevItems,
+        {
+          id,
+          body,
+          author,
+        },
+      ];
+    });
   }
 
   return {
     items,
     idSelectedPost,
+    selectedPost,
     selectPost,
+    addItem,
+    updateItem,
   };
 };
 
@@ -91,43 +95,40 @@ export const usePosts = ({
   openModal: () => void;
   closeModal: () => void;
 }) => {
-  const { items, idSelectedPost, selectPost } = useItems();
-  const { body, name, setBody, setName, handleChangeBody, handleChangeName, handleReset: onResetForm } =
-    useForm();
+  const { items, idSelectedPost, selectedPost, selectPost, updateItem, addItem } = useItems();
 
   const handleSelectPost = (id: number | null) => {
-    const post = selectPost(id);
-    setBody(post.body);
-    setName(post.name);
-    if (post.body) {
-      openModal();
-    } else {
-      closeModal();
-    }
+    selectPost(id);
+    openModal();
   };
 
   const handleCloseModal = () => {
-    handleSelectPost(null);
+    selectPost(null);
+    closeModal();
   };
 
   const handleReset = () => {
-    onResetForm();
     handleCloseModal();
   };
 
+  const handleSubmitForm = (data: { id: number | null; body: string; author: string }) => {
+    if (data.id) {
+      updateItem(data.id, data.body, data.author);
+    } else {
+      addItem(data.body, data.author);
+    }
+    handleReset();
+  };
+
   return {
-    body,
-    name,
-    setBody,
-    setName,
-    handleChangeBody,
-    handleChangeName,
     handleResetForNewPost: handleReset,
     items,
     idSelectedPost,
+    selectedPost,
     handleSelectPost,
     isOpenModal,
     openModal,
     handleCloseModal,
+    handleSubmitForm,
   };
 };
