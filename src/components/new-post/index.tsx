@@ -6,6 +6,7 @@ type Props = {
   name: string;
   onChangeBody: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onChangeName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onCancel: () => void;
 };
 
 export default function NewPost(props: Props) {
@@ -18,6 +19,10 @@ export default function NewPost(props: Props) {
       <div className={classes.field}>
         <label htmlFor="name">Author's name</label>
         <input type="text" id="name" value={props.name} required onChange={props.onChangeName}/>
+      </div>
+      <div className={classes.actions}>
+        <button type="button" onClick={props.onCancel}>Cancel</button>
+        <button type="submit">Submit</button>
       </div>
     </form>
   )

@@ -12,13 +12,19 @@ export const useForm = () => {
     setName(getValueOfInput(event));
   }
 
+  function handleReset() {
+    setBody("");
+    setName("");
+  }
+
   return {
-      body,
-      name,
-      setBody,
-      setName,
-      handleChangeBody,
-      handleChangeName,
+    body,
+    name,
+    setBody,
+    setName,
+    handleChangeBody,
+    handleChangeName,
+    handleReset,
   };
 };
 
@@ -86,7 +92,7 @@ export const usePosts = ({
   closeModal: () => void;
 }) => {
   const { items, idSelectedPost, selectPost } = useItems();
-  const { body, name, setBody, setName, handleChangeBody, handleChangeName } =
+  const { body, name, setBody, setName, handleChangeBody, handleChangeName, handleReset: onResetForm } =
     useForm();
 
   const handleSelectPost = (id: number | null) => {
@@ -104,6 +110,11 @@ export const usePosts = ({
     handleSelectPost(null);
   };
 
+  const handleReset = () => {
+    onResetForm();
+    handleCloseModal();
+  };
+
   return {
     body,
     name,
@@ -111,6 +122,7 @@ export const usePosts = ({
     setName,
     handleChangeBody,
     handleChangeName,
+    handleResetForNewPost: handleReset,
     items,
     idSelectedPost,
     handleSelectPost,

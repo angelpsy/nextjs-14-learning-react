@@ -24,6 +24,7 @@ export default function Posts({
     idSelectedPost,
     handleSelectPost,
     handleCloseModal,
+    handleResetForNewPost,
   } = usePosts({
     isOpenModal,
     openModal,
@@ -39,6 +40,7 @@ export default function Posts({
           name={name}
           onChangeBody={handleChangeBody}
           onChangeName={handleChangeName}
+          onCancel={handleResetForNewPost}
         />
       </Modal>
       <ul className={styles.root}>
