@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import usePostsServiceInstance from '../../hooks/posts-service-instance';
 
 type Item = {
   id: number | null;
@@ -6,23 +7,19 @@ type Item = {
   body: string;
 };
 export const useItems = () => {
-  const [items, setItems] = useState<Item[]>([
-    {
-      id: 1,
-      author: "Aleksei",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate, impedit repudiandae alias ex nisi dolor perferendis sequi autem distinctio doloremque fugit delectus debitis magni doloribus? Odit ab corporis eos quisquam.",
-    },
-    {
-      id: 2,
-      author: "Aleksey",
-      body: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Non, libero!",
-    },
-  ]);
+  const {
+    fetchPosts,
+    createPost,
+    updatePost,
+  } = usePostsServiceInstance('http://localhost:3000'); // TODO url move to env
+  const [items, setItems] = useState<Item[]>([]);
 
   const [idSelectedPost, setIdSelectedPost] = useState<null | number>(null);
 
-  const selectedPost = useMemo<Item>(() => {
-    return items.find((item) => item.id === idSelectedPost) || { id: null, body: "", author: "" };
+  const EMPTY_POST: Item = { id: null, author: "", body: "" };
+
+  const selectedPost = useMemo<Item | null>(() => {
+    return idSelectedPost ? items.find((item) => item.id === idSelectedPost) || EMPTY_POST : null;
   }, [idSelectedPost, items]);
 
   function selectPost(id: number | null) {
@@ -47,34 +44,33 @@ export const useItems = () => {
     };
   }
 
-  function updateItem(id: number, body: string, author: string) {
+  async function updateItem(id: number, author: string, body: string) {
+    const updatedPost = await updatePost(id, author, body);
     setItems((prevItems) => {
-        return prevItems.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              body,
-              author,
-            };
-          }
-          return item;
-        });
+      return prevItems.map((item) => {
+        if (item.id === id) {
+          return updatedPost;
+        }
+        return item;
+      });
     });
   }
 
-  function addItem(body: string, author: string) {
+  async function addItem(author: string, body: string) {
+    const newPost = await createPost(author, body);
     setItems((prevItems) => {
-      const id = prevItems.length + 1;
       return [
         ...prevItems,
-        {
-          id,
-          body,
-          author,
-        },
+        newPost,
       ];
     });
   }
+
+  useEffect(() => {
+    fetchPosts().then((data) => {
+      setItems(data || []);
+    });
+  }, []);
 
   return {
     items,
@@ -86,7 +82,7 @@ export const useItems = () => {
   };
 };
 
-export const usePosts = ({
+export const useIndex = ({
   isOpenModal,
   openModal,
   closeModal,
@@ -113,9 +109,9 @@ export const usePosts = ({
 
   const handleSubmitForm = (data: { id: number | null; body: string; author: string }) => {
     if (data.id) {
-      updateItem(data.id, data.body, data.author);
+      updateItem(data.id, data.author, data.body);
     } else {
-      addItem(data.body, data.author);
+      addItem(data.author, data.body);
     }
     handleReset();
   };

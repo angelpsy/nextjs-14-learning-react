@@ -24,7 +24,7 @@ export default function NewPost(props: Props) {
     if (!body || !name) {
       return;
     }
-    props.onSubmit({ id: id || null, body, author: name });
+    props.onSubmit({ id: id || null, author: name, body });
     handleReset();
   };
 
