@@ -2,7 +2,7 @@ import NewPost from "../new-post";
 import Post from "../post";
 import Modal from '../modal';
 import styles from "./styles.module.css";
-import { usePosts } from './hooks';
+import { useIndex } from './hooks';
 
 type Props = {
   isOpenModal: boolean;
@@ -23,7 +23,7 @@ export default function Posts({
     handleCloseModal,
     handleResetForNewPost,
     handleSubmitForm,
-  } = usePosts({
+  } = useIndex({
     isOpenModal,
     openModal,
     closeModal,
@@ -34,8 +34,8 @@ export default function Posts({
       <Modal open={isOpenModal} onClose={handleCloseModal}>
         {isOpenModal && <NewPost
           id={idSelectedPost}
-          defaultBody={selectedPost?.body}
-          defaultName={selectedPost?.author}
+          defaultBody={selectedPost?.body || ''}
+          defaultName={selectedPost?.author || ''}
           onCancel={handleResetForNewPost}
           onSubmit={handleSubmitForm}
         />}
