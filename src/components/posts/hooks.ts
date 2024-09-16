@@ -1,17 +1,45 @@
 import { useEffect, useMemo, useState } from "react";
-import usePostsServiceInstance from '../../hooks/posts-service-instance';
+import usePostsServiceInstance from "../../hooks/posts-service-instance";
+import { Post } from "../../types/post";
 
 type Item = {
   id: number | null;
   author: string;
   body: string;
 };
+
+const useLoading = <T, A extends any[]>(callback: (...args: A) => Promise<T>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const fn = async (...args: A): Promise<T> => {
+    setIsLoading(true);
+    let res: T;
+    try {
+      res = await callback(...args);
+      setIsLoading(false);
+      return res;
+    } catch (error) {
+      setError((error as Error).message);
+      setIsLoading(false);
+      throw error;
+    }
+  };
+
+  return {
+    isLoading,
+    error,
+    fn,
+  };
+};
+
 export const useItems = () => {
-  const {
-    fetchPosts,
-    createPost,
-    updatePost,
-  } = usePostsServiceInstance('http://localhost:3000'); // TODO url move to env
+  const { fetchPosts, createPost, updatePost } = usePostsServiceInstance(
+    "http://localhost:3000"
+  ); // TODO url move to env
+  const { fn: fetchData, isLoading: isLoadingFetchData, error: errorOfFetchData } = useLoading(fetchPosts);
+  const { fn: createData, isLoading: isLoadingCreatePost, error: errorOfCreatePost } = useLoading(createPost);
+  const { fn: updateData, isLoading: isLoadingUpdatePost, error: errorOfUpdatePost } = useLoading(updatePost);
   const [items, setItems] = useState<Item[]>([]);
 
   const [idSelectedPost, setIdSelectedPost] = useState<null | number>(null);
@@ -19,7 +47,9 @@ export const useItems = () => {
   const EMPTY_POST: Item = { id: null, author: "", body: "" };
 
   const selectedPost = useMemo<Item | null>(() => {
-    return idSelectedPost ? items.find((item) => item.id === idSelectedPost) || EMPTY_POST : null;
+    return idSelectedPost
+      ? items.find((item) => item.id === idSelectedPost) || EMPTY_POST
+      : null;
   }, [idSelectedPost, items]);
 
   function selectPost(id: number | null) {
@@ -45,7 +75,7 @@ export const useItems = () => {
   }
 
   async function updateItem(id: number, author: string, body: string) {
-    const updatedPost = await updatePost(id, author, body);
+    const updatedPost = await updateData(id, author, body);
     setItems((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
@@ -57,17 +87,14 @@ export const useItems = () => {
   }
 
   async function addItem(author: string, body: string) {
-    const newPost = await createPost(author, body);
+    const newPost = await createData(author, body);
     setItems((prevItems) => {
-      return [
-        ...prevItems,
-        newPost,
-      ];
+      return [...prevItems, newPost];
     });
   }
 
   useEffect(() => {
-    fetchPosts().then((data) => {
+    fetchData().then((data) => {
       setItems(data || []);
     });
   }, []);
@@ -76,6 +103,12 @@ export const useItems = () => {
     items,
     idSelectedPost,
     selectedPost,
+    isLoadingFetchData,
+    errorOfFetching: errorOfFetchData,
+    isLoadingCreatePost,
+    errorOfCreatePost,
+    isLoadingUpdatePost,
+    errorOfUpdatePost,
     selectPost,
     addItem,
     updateItem,
@@ -91,7 +124,20 @@ export const useIndex = ({
   openModal: () => void;
   closeModal: () => void;
 }) => {
-  const { items, idSelectedPost, selectedPost, selectPost, updateItem, addItem } = useItems();
+  const {
+    items,
+    idSelectedPost,
+    selectedPost,
+    isLoadingFetchData,
+    errorOfFetching,
+    isLoadingCreatePost,
+    errorOfCreatePost,
+    isLoadingUpdatePost,
+    errorOfUpdatePost,
+    selectPost,
+    updateItem,
+    addItem,
+  } = useItems();
 
   const handleSelectPost = (id: number | null) => {
     selectPost(id);
@@ -107,22 +153,32 @@ export const useIndex = ({
     handleCloseModal();
   };
 
-  const handleSubmitForm = (data: { id: number | null; body: string; author: string }) => {
+  const handleSubmitForm = async (data: {
+    id: number | null;
+    body: string;
+    author: string;
+  }) => {
     if (data.id) {
-      updateItem(data.id, data.author, data.body);
+      await updateItem(data.id, data.author, data.body);
     } else {
-      addItem(data.author, data.body);
+      await addItem(data.author, data.body);
     }
     handleReset();
   };
 
   return {
-    handleResetForNewPost: handleReset,
     items,
     idSelectedPost,
     selectedPost,
-    handleSelectPost,
     isOpenModal,
+    isLoadingFetchData,
+    errorOfFetching,
+    isLoadingCreatePost,
+    errorOfCreatePost,
+    isLoadingUpdatePost,
+    errorOfUpdatePost,
+    handleResetForNewPost: handleReset,
+    handleSelectPost,
     openModal,
     handleCloseModal,
     handleSubmitForm,
