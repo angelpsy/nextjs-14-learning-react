@@ -19,6 +19,12 @@ export default function Posts({
     items,
     idSelectedPost,
     selectedPost,
+    isLoadingFetchData,
+    errorOfFetching,
+    isLoadingCreatePost,
+    errorOfCreatePost,
+    isLoadingUpdatePost,
+    errorOfUpdatePost,
     handleSelectPost,
     handleCloseModal,
     handleResetForNewPost,
@@ -29,16 +35,25 @@ export default function Posts({
     closeModal,
   });
 
+  if (isLoadingFetchData) {
+    return <p>Loading...</p>;
+  }
+
+  if (errorOfFetching) {
+    return <p>Error: {errorOfFetching}</p>;
+  }
+
   return (
     <>
-      <Modal open={isOpenModal} onClose={handleCloseModal}>
-        {isOpenModal && <NewPost
+      <Modal open={isOpenModal || isLoadingCreatePost || isLoadingUpdatePost} onClose={handleCloseModal}>
+        <NewPost
           id={idSelectedPost}
           defaultBody={selectedPost?.body || ''}
           defaultName={selectedPost?.author || ''}
           onCancel={handleResetForNewPost}
           onSubmit={handleSubmitForm}
-        />}
+          isDisabled={isLoadingCreatePost || isLoadingUpdatePost}
+        />
       </Modal>
       <ul className={styles.root}>
         {items.map((item) => {

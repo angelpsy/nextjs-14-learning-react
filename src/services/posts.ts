@@ -1,3 +1,5 @@
+import { Post } from '../types/post';
+
 class PostsService {
   private static instance: PostsService;
   private baseUrl: string;
@@ -13,7 +15,7 @@ class PostsService {
     return PostsService.instance;
   }
 
-  async createPost(author: string, body: string) {
+  async createPost(author: string, body: string): Promise<Post> {
 
     const response = await fetch(`${this.baseUrl}/posts`, {
       method: 'POST',
@@ -25,12 +27,12 @@ class PostsService {
     return response.json();
   }
 
-  async getPosts() {
+  async getPosts(): Promise<Post[]> {
     const response = await fetch(`${this.baseUrl}/posts`);
     return response.json();
   }
 
-  async getPostById(id: number) {
+  async getPostById(id: number): Promise<Post> {
     const response = await fetch(`${this.baseUrl}/posts/${id}`);
     if (response.ok) {
       return response.json();
@@ -39,7 +41,7 @@ class PostsService {
     }
   }
 
-  async updatePost(id: number, author: string, body: string) {
+  async updatePost(id: number, author: string, body: string): Promise<Post> {
     const response = await fetch(`${this.baseUrl}/posts/${id}`, {
       method: 'PUT',
       headers: {
@@ -54,12 +56,12 @@ class PostsService {
     }
   }
 
-  async deletePost(id: number) {
+  async deletePost(id: number): Promise<void> {
     const response = await fetch(`${this.baseUrl}/posts/${id}`, {
       method: 'DELETE',
     });
     if (response.ok) {
-      return 'Post deleted successfully';
+      return;
     } else {
       throw new Error('Post not found');
     }

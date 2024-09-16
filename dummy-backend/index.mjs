@@ -20,7 +20,7 @@ const writeData = (data) => {
 };
 
 // Create a new post
-app.post('/posts', (req, res) => {
+app.post('/posts', async (req, res) => {
   const { author, body } = req.body;
   if (!author || !body) {
     return res.status(400).json({ message: 'Author and body are required' });
@@ -29,12 +29,14 @@ app.post('/posts', (req, res) => {
   const newPost = { id: Date.now().toString(), author, body };
   posts.push(newPost);
   writeData(posts);
+  await new Promise(resolve => setTimeout(resolve, 3000));
   res.status(201).json(newPost);
 });
 
 // Get all posts
-app.get('/posts', (req, res) => {
+app.get('/posts', async (req, res) => {
   const posts = readData();
+  await new Promise(resolve => setTimeout(resolve, 1000));
   res.json(posts);
 });
 
