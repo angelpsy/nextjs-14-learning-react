@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { useForm } from './hooks';
 import classes from './styles.module.css'
+import { IPost } from '../../types/posts';
 
 type Props = {
   id?: number | null;

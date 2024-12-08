@@ -1,11 +1,10 @@
 .root {
+  position: relative;
   container-type: inline-size;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  list-style: none;
+  padding: 0;
 }
 
 .selected {
@@ -32,4 +31,11 @@
   @container (width > 500px) {
     align-self: start;
   }
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }

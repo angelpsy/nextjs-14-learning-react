@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import styles from "./styles.module.css";
 
 type Props = {
@@ -6,17 +7,18 @@ type Props = {
   body: string;
   className?: string;
   htmlTag?: React.ElementType;
-  selected?: boolean;
-  onSelect?: (id: number) => void;
+  isActive?: boolean;
 };
 
 export default function Post(props: Props) {
-  const classNameOfRoot = styles.root + (props.selected ? ` ${styles.selected}` : "") + (props.className ? ` ${props.className}` : "");
+  const classNameOfRoot = styles.root + (props.isActive ? ` ${styles.selected}` : "") + (props.className ? ` ${props.className}` : "");
   const Tag = props.htmlTag || "li";
   return (
-    <Tag className={classNameOfRoot} onClick={() => props.onSelect?.(props.id)}>
-      <p className={styles.author}>{props.author}</p>
-      <p className={styles.body}>{props.body}</p>
+    <Tag className={classNameOfRoot}>
+      <Link to={`/posts/${props.id}`} className={styles.link}>
+        <p className={styles.author}>{props.author}</p>
+        <p className={styles.body}>{props.body}</p>
+      </Link>
     </Tag>
   );
 }
