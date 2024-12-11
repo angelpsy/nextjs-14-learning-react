@@ -1,15 +1,15 @@
 import { BACKEND_URL } from '../env';
 import PostsService from '../services/posts';
 
-const usePostsService = (baseUrl: string = BACKEND_URL) => {
-  const postsService = PostsService.getInstance(baseUrl);
+export const postServiceInstance = PostsService.getInstance(BACKEND_URL);
 
+const usePostsService = () => {
   return {
-    getPosts: postsService.getPosts.bind(postsService),
-    getPostById: postsService.getPostById.bind(postsService),
-    createPost: postsService.createPost.bind(postsService),
-    updatePost: postsService.updatePost.bind(postsService),
-    deletePost: postsService.deletePost.bind(postsService),
+    getPosts: postServiceInstance.getPosts.bind(postServiceInstance),
+    getPostById: postServiceInstance.getPostById.bind(postServiceInstance),
+    createPost: postServiceInstance.createPost.bind(postServiceInstance),
+    updatePost: postServiceInstance.updatePost.bind(postServiceInstance),
+    deletePost: postServiceInstance.deletePost.bind(postServiceInstance),
   };
 };
 
